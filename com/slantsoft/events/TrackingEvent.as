@@ -8,6 +8,8 @@ package com.slantsoft.events
 		public static const STOP:String = "StopTrackingEvent";
 		
 		public var description:String;
+		public var startDate:Date;
+		public var endDate:Date;
 		
 		public function TrackingEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=false)
 		{

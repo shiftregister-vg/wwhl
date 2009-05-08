@@ -5,21 +5,29 @@
 	
 	<Script>
 		<![CDATA[
+			import mx.controls.Alert;
 			import mx.collections.ArrayCollection;
 			import com.slantsoft.events.StatsEvent;
 			import com.slantsoft.events.TrackingEvent;
 			
 			private var _trackedEvents:ArrayCollection;
+			private var startDate:Date;
+			private var endDate:Date;
 			
 			public function set trackedEvents(value:ArrayCollection):void{
 				_trackedEvents = value;
+				dispatchEvent(new Event('trackedEventsChanged'));
 			}
 			
+			[Bindable ('trackedEventsChanged')]
 			public function get trackedEvents():ArrayCollection{
 				return _trackedEvents;
 			}
 			
 			private function init():void{
+				this.nativeWindow.x = (Capabilities.screenResolutionX - width) / 2;
+				this.nativeWindow.y = (Capabilities.screenResolutionY - height) / 2;
+				
 				dispatcher.dispatchEvent(new Event('ApplicationInit'));
 			}
 			
@@ -28,11 +36,15 @@
 				var e:TrackingEvent;
 				
 				if (isSelected){
+					startDate = new Date();
 					e = new TrackingEvent(TrackingEvent.START);
-					e.description = descriptionTI.text;
 					descriptionTI.enabled = false;
 				} else {
+					endDate = new Date();
 					e = new TrackingEvent(TrackingEvent.STOP);
+					e.description = descriptionTI.text;
+					e.startDate = startDate;
+					e.endDate = endDate;
 					descriptionTI.text = '';
 					descriptionTI.enabled = true;
 				}

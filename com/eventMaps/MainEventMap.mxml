@@ -4,6 +4,7 @@
 		<![CDATA[
 			import com.slantsoft.events.*;
 			import com.slantsoft.managers.*;
+			import com.slantsoft.views.*;
 		]]>
 	</Script>
 	
@@ -23,5 +24,9 @@
 		<mate:EventHandlers type="{StatsEvent.OPEN_WINDOW}">
 			<mate:MethodInvoker generator="{NativeWindowManager}" method="openStatsWindow"/>
 		</mate:EventHandlers>
+		
+		<mate:Injectors targets="{[WhenWhatHowLong,StatsWindow]}">
+			<mate:PropertyInjector source="{TrackingManager}" sourceKey="trackedEvents" targetKey="trackedEvents"/>
+		</mate:Injectors>
 	</Declarations>
 </mate:EventMap>

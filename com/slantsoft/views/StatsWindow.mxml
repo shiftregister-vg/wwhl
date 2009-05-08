@@ -1,10 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window xmlns="http://ns.adobe.com/mxml/2009" layout="horizontal" width="600" height="400" creationComplete="init()" title="Stats">
+<Window xmlns="http://ns.adobe.com/mxml/2009" layout="horizontal" creationComplete="init()" title="Stats">
 	
 	<Script>
 		<![CDATA[
+			import com.asfusion.mate.ioc.InjectorRegistry;
+			import mx.collections.ArrayCollection;
+			
+			private var _trackedEvents:ArrayCollection;
+			
+			public function set trackedEvents(value:ArrayCollection):void{
+				_trackedEvents = value;
+				dispatchEvent(new Event('trackedEventsChanged'));
+			}
+			
+			[Bindable ('trackedEventsChanged')]
+			public function get trackedEvents():ArrayCollection{
+				return _trackedEvents;
+			}
 			
 			private function init():void{
+				InjectorRegistry.register(this);
+				
 				this.nativeWindow.x = (Capabilities.screenResolutionX - width) / 2;
 				this.nativeWindow.y = (Capabilities.screenResolutionY - height) / 2;
 			}
@@ -13,17 +29,20 @@
 	
 	<Tree height="100%" width="225"></Tree>
 	<VGroup width="100%" height="100%">
-		<ColumnChart id="Week" height="100%" width="100%">
+		<TextView text="Week" fontWeight="bold" editable="false" selectable="false"/>
+		<ColumnChart id="week" height="100%" width="100%">
 			<series>
 				<ColumnSeries displayName="Series 1" yField=""/>
 			</series>
 		</ColumnChart>
-		<ColumnChart id="Month" height="100%" width="100%">
+		<TextView text="Month" fontWeight="bold" editable="false" selectable="false"/>
+		<ColumnChart id="month" height="100%" width="100%">
 			<series>
 				<ColumnSeries displayName="Series 1" yField=""/>
 			</series>
 		</ColumnChart>
-		<ColumnChart id="Year" width="100%" height="100%">
+		<TextView text="Year" fontWeight="bold" editable="false" selectable="false"/>
+		<ColumnChart id="year" width="100%" height="100%">
 			<series>
 				<ColumnSeries displayName="Series 1" yField=""/>
 			</series>
