@@ -1,4 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<WindowedApplication xmlns="http://ns.adobe.com/mxml/2009" layout="absolute">
+<WindowedApplication xmlns="http://ns.adobe.com/mxml/2009" layout="vertical" xmlns:eventMaps="com.eventMaps.*" width="500" height="300"
+	paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" showStatusBar="false" minHeight="300" minWidth="500"
+	horizontalScrollPolicy="off" verticalScrollPolicy="off" creationComplete="init()" xmlns:mate="http://mate.asfusion.com/">
 	
+	<Script>
+		<![CDATA[
+			import com.slantsoft.events.TrackingEvent;
+			
+			
+			private function init():void{
+				dispatcher.dispatchEvent(new Event('ApplicationInit'));
+			}
+			
+			private function onStartStopTBClick(event:MouseEvent):void{
+				var isSelected:Boolean = startStopTB.selected;
+				var e:TrackingEvent;
+				
+				if (isSelected){
+					e = new TrackingEvent(TrackingEvent.START);
+				} else {
+					e = new TrackingEvent(TrackingEvent.STOP);
+				}
+				
+				dispatcher.dispatchEvent(e);
+			}
+		]]>
+	</Script>
+	
+	<HGroup width="100%" verticalAlign="middle">
+		<TextView text="Description" fontWeight="bold" editable="false" selectable="false" fontSize="14"/>
+		<FxTextInput width="100%" id="descriptionTI"/>
+		<FxToggleButton label="Start / Stop" id="startStopTB" click="onStartStopTBClick(event)"/>
+		<FxButton label="Stats" id="statsBtn"/>
+	</HGroup>
+	
+	<DataGrid width="100%" height="100%" resizableColumns="false" variableRowHeight="true" sortableColumns="false">
+		<columns>
+			<DataGridColumn headerText="Start" dataField="start" width="100"/>
+			<DataGridColumn headerText="Description" dataField="description"/>
+			<DataGridColumn headerText="Duration" dataField="duration" width="100"/>
+		</columns>
+	</DataGrid>
+	
+	<Declarations>
+		<mate:Dispatcher id="dispatcher"/>
+		<eventMaps:MainEventMap/>
+	</Declarations>
 </WindowedApplication>

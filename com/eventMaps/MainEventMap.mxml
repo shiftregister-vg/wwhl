@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mate:EventMap xmlns="http://ns.adobe.com/mxml/2009" xmlns:mate="http://mate.asfusion.com/">
+	<Script>
+		<![CDATA[
+			import com.slantsoft.events.*;
+		]]>
+	</Script>
+	
+	<Declarations>
+		<mate:Debugger level="{Debugger.ALL}"/>
+	
+		<mate:EventHandlers type="ApplicationInit" debug="true">
+			
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{TrackingEvent.START}">
+			
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{TrackingEvent.STOP}">
+			
+		</mate:EventHandlers>
+	</Declarations>
+</mate:EventMap>
