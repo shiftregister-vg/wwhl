@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window xmlns="http://ns.adobe.com/mxml/2009" layout="horizontal" width="600" height="400" creationComplete="init()" title="Stats">
+	
+	<Script>
+		<![CDATA[
+			
+			private function init():void{
+				this.nativeWindow.x = (Capabilities.screenResolutionX - width) / 2;
+				this.nativeWindow.y = (Capabilities.screenResolutionY - height) / 2;
+			}
+		]]>
+	</Script>
+	
+	<Tree height="100%" width="225"></Tree>
+	<VGroup width="100%" height="100%">
+		<ColumnChart id="Week" height="100%" width="100%">
+			<series>
+				<ColumnSeries displayName="Series 1" yField=""/>
+			</series>
+		</ColumnChart>
+		<ColumnChart id="Month" height="100%" width="100%">
+			<series>
+				<ColumnSeries displayName="Series 1" yField=""/>
+			</series>
+		</ColumnChart>
+		<ColumnChart id="Year" width="100%" height="100%">
+			<series>
+				<ColumnSeries displayName="Series 1" yField=""/>
+			</series>
+		</ColumnChart>
+	</VGroup>
+	
+</Window>

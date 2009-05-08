@@ -3,13 +3,12 @@
 	<Script>
 		<![CDATA[
 			import com.slantsoft.events.*;
+			import com.slantsoft.managers.*;
 		]]>
 	</Script>
 	
 	<Declarations>
-		<mate:Debugger level="{Debugger.ALL}"/>
-	
-		<mate:EventHandlers type="ApplicationInit" debug="true">
+		<mate:EventHandlers type="ApplicationInit">
 			
 		</mate:EventHandlers>
 		
@@ -19,6 +18,10 @@
 		
 		<mate:EventHandlers type="{TrackingEvent.STOP}">
 			
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{StatsEvent.OPEN_WINDOW}">
+			<mate:MethodInvoker generator="{NativeWindowManager}" method="openStatsWindow"/>
 		</mate:EventHandlers>
 	</Declarations>
 </mate:EventMap>
