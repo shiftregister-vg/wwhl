@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<WindowedApplication xmlns="http://ns.adobe.com/mxml/2009" layout="vertical" xmlns:eventMaps="com.eventMaps.*" width="500" height="300"
-	paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" showStatusBar="false" minHeight="300" minWidth="500"
-	horizontalScrollPolicy="off" verticalScrollPolicy="off" creationComplete="init()" xmlns:mate="http://mate.asfusion.com/">
+<mx:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/halo"
+	layout="vertical" xmlns:eventMaps="com.eventMaps.*"	width="500" height="300" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10"
+	showStatusBar="false" minHeight="300" minWidth="500" horizontalScrollPolicy="off" verticalScrollPolicy="off" creationComplete="init()"
+	xmlns:mate="http://mate.asfusion.com/">
 	
-	<Script>
+	<fx:Script>
 		<![CDATA[
 			import mx.controls.Alert;
 			import mx.collections.ArrayCollection;
@@ -57,26 +58,26 @@
 				dispatcher.dispatchEvent(e);
 			}
 		]]>
-	</Script>
+	</fx:Script>
 	
-	<HGroup width="100%" verticalAlign="middle">
-		<TextView text="Description" fontWeight="bold" editable="false" selectable="false" fontSize="14"/>
-		<FxTextInput width="100%" id="descriptionTI"/>
-		<FxToggleButton label="Start / Stop" id="startStopTB" click="onStartStopTBClick()"/>
-		<FxButton label="Stats" id="statsBtn" click="onStatsBtnClick()"/>
-	</HGroup>
+	<s:HGroup width="100%" verticalAlign="middle">
+		<mx:Label text="Description" fontWeight="bold" fontSize="14"/>
+		<mx:TextInput width="100%" id="descriptionTI"/>
+		<s:ToggleButton label="Start / Stop" id="startStopTB" click="onStartStopTBClick()"/>
+		<mx:Button label="Stats" id="statsBtn" click="onStatsBtnClick()"/>
+	</s:HGroup>
 	
-	<DataGrid width="100%" height="100%" dataProvider="{trackedEvents}"
+	<mx:DataGrid width="100%" height="100%" dataProvider="{trackedEvents}"
 		resizableColumns="false" variableRowHeight="true" sortableColumns="false">
-		<columns>
-			<DataGridColumn headerText="Start" dataField="start" width="100"/>
-			<DataGridColumn headerText="Description" dataField="description"/>
-			<DataGridColumn headerText="Duration" dataField="duration" width="100"/>
-		</columns>
-	</DataGrid>
+		<mx:columns>
+			<mx:DataGridColumn headerText="Start" dataField="start" width="100"/>
+			<mx:DataGridColumn headerText="Description" dataField="description"/>
+			<mx:DataGridColumn headerText="Duration" dataField="duration" width="100"/>
+		</mx:columns>
+	</mx:DataGrid>
 	
-	<Declarations>
+	<fx:Declarations>
 		<mate:Dispatcher id="dispatcher"/>
 		<eventMaps:MainEventMap/>
-	</Declarations>
-</WindowedApplication>
+	</fx:Declarations>
+</mx:WindowedApplication>
