@@ -8,20 +8,23 @@
 		<![CDATA[
 			import mx.controls.Alert;
 			import mx.collections.ArrayCollection;
-			import com.slantsoft.events.StatsEvent;
+			import com.flexandair.StopWatch;
+			import com.slantsoft.events.HistoryEvent;
 			import com.slantsoft.events.TrackingEvent;
 			
-			private var _trackedEvents:ArrayCollection;
+			private var _trackedEvents:Array;
 			private var startDate:Date;
 			private var endDate:Date;
 			
-			public function set trackedEvents(value:ArrayCollection):void{
+			[Bindable] private var stopWatch:StopWatch = new StopWatch();
+			
+			public function set trackedEvents(value:Array):void{
 				_trackedEvents = value;
 				dispatchEvent(new Event('trackedEventsChanged'));
 			}
 			
 			[Bindable ('trackedEventsChanged')]
-			public function get trackedEvents():ArrayCollection{
+			public function get trackedEvents():Array{
 				return _trackedEvents;
 			}
 			
@@ -33,45 +36,77 @@
 			}
 			
 			private function onStartStopTBClick():void{
-				var isSelected:Boolean = startStopTB.selected;
-				var e:TrackingEvent;
-				
-				if (isSelected){
-					startDate = new Date();
-					e = new TrackingEvent(TrackingEvent.START);
-					descriptionTI.enabled = false;
+				if (descriptionTI.text != ''){
+					var isSelected:Boolean = startStopTB.selected;
+					var e:TrackingEvent;
+					
+					if (isSelected){
+						startDate = new Date();
+						e = new TrackingEvent(TrackingEvent.START);
+						descriptionTI.enabled = false;
+						timerLbl.addEventListener(Event.ENTER_FRAME,updateTime);
+						stopWatch.start();
+					} else {
+						timerLbl.removeEventListener(Event.ENTER_FRAME,updateTime);
+						stopWatch.pause();
+						endDate = new Date();
+						e = new TrackingEvent(TrackingEvent.STOP);
+						e.description = descriptionTI.text;
+						e.startDate = startDate;
+						e.endDate = endDate;
+						e.duration = timerLbl.text;
+						descriptionTI.text = '';
+						descriptionTI.enabled = true;
+						stopWatch.reset();
+						timerLbl.text = '00:00:00';
+					}
+					
+					dispatcher.dispatchEvent(e);
 				} else {
-					endDate = new Date();
-					e = new TrackingEvent(TrackingEvent.STOP);
-					e.description = descriptionTI.text;
-					e.startDate = startDate;
-					e.endDate = endDate;
-					descriptionTI.text = '';
-					descriptionTI.enabled = true;
+					startStopTB.selected = false;
+					Alert.show('A description is required');
 				}
-				
+			}
+			
+			private function onHistoryBtnClick():void{
+				var e:HistoryEvent = new HistoryEvent(HistoryEvent.OPEN_WINDOW);
 				dispatcher.dispatchEvent(e);
 			}
 			
-			private function onStatsBtnClick():void{
-				var e:StatsEvent = new StatsEvent(StatsEvent.OPEN_WINDOW);
-				dispatcher.dispatchEvent(e);
+			private function onDescriptionTIEnterKey():void{
+				startStopTB.selected = true;
+				onStartStopTBClick();
+			}
+			
+			private function updateTime(event:Event):void{
+				var time:String = stopWatch.getTimeStampAsString();
+				timerLbl.text = time;
+			}
+			
+			private function startWatch():void{
+				
 			}
 		]]>
 	</fx:Script>
 	
 	<s:HGroup width="100%" verticalAlign="middle">
 		<mx:Label text="Description" fontWeight="bold" fontSize="14"/>
-		<mx:TextInput width="100%" id="descriptionTI"/>
+		<mx:TextInput width="100%" id="descriptionTI" enter="onDescriptionTIEnterKey()"/>
 		<s:ToggleButton label="Start / Stop" id="startStopTB" click="onStartStopTBClick()"/>
-		<mx:Button label="Stats" id="statsBtn" click="onStatsBtnClick()"/>
+		<mx:Button label="History" id="historyBtn" click="onHistoryBtnClick()"/>
 	</s:HGroup>
 	
-	<mx:DataGrid width="100%" height="100%" dataProvider="{trackedEvents}"
-		resizableColumns="false" variableRowHeight="true" sortableColumns="false">
+	<s:HGroup width="100%" verticalAlign="middle" textAlign="center">
+		<mx:Spacer width="100%"/>
+		<mx:Label text="Elapsed Time:"/>
+		<mx:Label text="00:00:00" id="timerLbl"/>
+	</s:HGroup>
+	
+	<mx:DataGrid width="100%" height="100%" dataProvider="{trackedEvents}" liveScrolling="true"
+		resizableColumns="false" variableRowHeight="true" sortableColumns="true" wordWrap="true">
 		<mx:columns>
-			<mx:DataGridColumn headerText="Start" dataField="start" width="100"/>
-			<mx:DataGridColumn headerText="Description" dataField="description"/>
+			<mx:DataGridColumn headerText="Start" dataField="startDateTime" width="100"/>
+			<mx:DataGridColumn headerText="Description" dataField="description" sortable="false"/>
 			<mx:DataGridColumn headerText="Duration" dataField="duration" width="100"/>
 		</mx:columns>
 	</mx:DataGrid>

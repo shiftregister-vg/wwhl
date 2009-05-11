@@ -6,12 +6,26 @@
 			import com.slantsoft.events.*;
 			import com.slantsoft.managers.*;
 			import com.slantsoft.views.*;
+			
+			[Bindable] private var appOpenDate:Date = new Date();
 		]]>
 	</fx:Script>
 	
 	<fx:Declarations>
 		<mate:EventHandlers type="ApplicationInit">
-			
+			<mate:MethodInvoker generator="{DatabaseManager}" method="initDatabase"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.INIT_COMPLETE}">
+			<mate:EventAnnouncer generator="{DatabaseEvent}" type="{DatabaseEvent.GET_TRACKED_EVENTS}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.GET_TRACKED_EVENTS}">
+			<mate:MethodInvoker generator="{DatabaseManager}" method="getTrackedEvents" arguments="{appOpenDate}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.TRACKED_EVENTS_RESULTS}">
+			<mate:MethodInvoker generator="{TrackingManager}" method="storeTrackedEvents" arguments="{event.recordSet}"/>
 		</mate:EventHandlers>
 		
 		<mate:EventHandlers type="{TrackingEvent.START}">
@@ -19,15 +33,38 @@
 		</mate:EventHandlers>
 		
 		<mate:EventHandlers type="{TrackingEvent.STOP}">
-			
+			<mate:MethodInvoker generator="{DatabaseManager}" method="storeNewTrackedEvent" arguments="{event}"/>
 		</mate:EventHandlers>
 		
-		<mate:EventHandlers type="{StatsEvent.OPEN_WINDOW}">
-			<mate:MethodInvoker generator="{NativeWindowManager}" method="openStatsWindow"/>
+		<mate:EventHandlers type="{HistoryEvent.OPEN_WINDOW}">
+			<mate:MethodInvoker generator="{NativeWindowManager}" method="openHistoryWindow"/>
 		</mate:EventHandlers>
 		
-		<mate:Injectors targets="{[WhenWhatHowLong,StatsWindow]}">
+		<mate:EventHandlers type="{DatabaseEvent.GET_TRACKED_EVENTS_DATES}">
+			<mate:MethodInvoker generator="{DatabaseManager}" method="getHistoryDates"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.TRACKED_EVENTS_DATES}">
+			<mate:MethodInvoker generator="{TrackingManager}" method="storeTrackedEventsDates" arguments="{event.recordSet}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{TrackingEvent.GET_TRACKED_EVENTS_BY_DATE}">
+			<mate:MethodInvoker generator="{DatabaseManager}" method="getHistoryByDate" arguments="{event.dateString}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.TRACKED_EVENTS_BY_DATE}">
+			<mate:MethodInvoker generator="{TrackingManager}" method="storeTrackedEventsByDate" arguments="{event.recordSet}"/>
+		</mate:EventHandlers>
+
+		<!-- Injectors -->
+		
+		<mate:Injectors targets="{[WhenWhatHowLong]}">
 			<mate:PropertyInjector source="{TrackingManager}" sourceKey="trackedEvents" targetKey="trackedEvents"/>
+		</mate:Injectors>
+		
+		<mate:Injectors target="{HistoryWindow}">
+			<mate:PropertyInjector source="{TrackingManager}" sourceKey="trackedEventsDates" targetKey="trackedEventsDates"/>
+			<mate:PropertyInjector source="{TrackingManager}" sourceKey="trackedEventsByDate" targetKey="trackedEventsByDate"/>
 		</mate:Injectors>
 	</fx:Declarations>
 </mate:EventMap>

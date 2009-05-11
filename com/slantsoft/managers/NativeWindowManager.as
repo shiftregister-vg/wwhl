@@ -1,33 +1,33 @@
 package com.slantsoft.managers
 {
-	import com.slantsoft.views.StatsWindow;
+	import com.slantsoft.views.HistoryWindow;
 	
 	import flash.events.EventDispatcher;
 	import flash.system.Capabilities;
 
 	public class NativeWindowManager extends EventDispatcher
 	{
-		private var statsWindow:StatsWindow;
+		private var historyWindow:HistoryWindow;
 		
-		public function openStatsWindow():void{
+		public function openHistoryWindow():void{
 			var targetHeight:int = 400;
 			var targetWidth:int = 600;
 			
-			if (!statsWindow || statsWindow.closed){
-				statsWindow = new StatsWindow();
+			if (!historyWindow || historyWindow.closed){
+				historyWindow = new HistoryWindow();
 				
-				statsWindow.height = targetHeight;
-				statsWindow.width = targetWidth;
-				statsWindow.minHeight = targetHeight;
-				statsWindow.minWidth = targetWidth;
+				historyWindow.height = targetHeight;
+				historyWindow.width = targetWidth;
+				historyWindow.minHeight = targetHeight;
+				historyWindow.minWidth = targetWidth;
 				
-				statsWindow.open();
+				historyWindow.open();
 				
-				statsWindow.nativeWindow.x = (Capabilities.screenResolutionX - targetWidth) / 2;
-				statsWindow.nativeWindow.y = (Capabilities.screenResolutionY - targetHeight) / 2;
+				historyWindow.nativeWindow.x = (Capabilities.screenResolutionX - targetWidth) / 2;
+				historyWindow.nativeWindow.y = (Capabilities.screenResolutionY - targetHeight) / 2;
 			}
 			
-			statsWindow.activate();
+			historyWindow.activate();
 		}
 	}
 }

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx="library://ns.adobe.com/flex/halo"	layout="horizontal" creationComplete="init()" title="History"
+	paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" showStatusBar="false"
+	xmlns:mate="http://mate.asfusion.com/" close="onWindowClose()">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.slantsoft.events.TrackingEvent;
+			import com.slantsoft.events.DatabaseEvent;
+			import mx.controls.Alert;
+			import com.asfusion.mate.ioc.InjectorRegistry;
+			import mx.collections.ArrayCollection;
+			
+			private var _trackedEventsDates:Array;
+			private var _trackedEventsByDate:Array;
+			
+			public function set trackedEventsDates(value:Array):void{
+				_trackedEventsDates = value;
+				dispatchEvent(new Event('trackedEventsDatesChanged'));
+			}
+			
+			public function set trackedEventsByDate(value:Array):void{
+				_trackedEventsByDate = value;
+				dispatchEvent(new Event('trackedEventsByDateChanged'));
+			}
+			
+			[Bindable ('trackedEventsDatesChanged')]
+			public function get trackedEventsDates():Array{
+				return _trackedEventsDates;
+			}
+			
+			[Bindable ('trackedEventsByDateChanged')]
+			public function get trackedEventsByDate():Array{
+				return _trackedEventsByDate;
+			}
+			
+			private function init():void{
+				InjectorRegistry.register(this);
+				
+				this.nativeWindow.x = (Capabilities.screenResolutionX - width) / 2;
+				this.nativeWindow.y = (Capabilities.screenResolutionY - height) / 2;
+				
+				dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.GET_TRACKED_EVENTS_DATES));
+			}
+
+			protected function datesList_clickHandler():void{
+				if (datesList.selectedItem){
+					var e:TrackingEvent = new TrackingEvent(TrackingEvent.GET_TRACKED_EVENTS_BY_DATE);
+					e.dateString = datesList.selectedItem.date;
+					dispatcher.dispatchEvent(e);
+				}
+			}
+			
+			private function onWindowClose():void{
+				var e:TrackingEvent = new TrackingEvent(TrackingEvent.GET_TRACKED_EVENTS_BY_DATE);
+				e.dateString = '01-01-1900';
+				dispatcher.dispatchEvent(e);
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:List id="datesList" height="100%" width="100" dataProvider="{arrList}"
+		click="datesList_clickHandler()" labelField="date"/>
+		
+	<mx:DataGrid id="trackedEventsDG" width="100%" height="100%" dataProvider="{trackedEventsByDate}" liveScrolling="true"
+		resizableColumns="false" variableRowHeight="true" sortableColumns="true" wordWrap="true">
+		<mx:columns>
+			<mx:DataGridColumn headerText="Start" dataField="startDateTime" width="100"/>
+			<mx:DataGridColumn headerText="Description" dataField="description" sortable="false"/>
+			<mx:DataGridColumn headerText="Duration" dataField="duration" width="100"/>
+		</mx:columns>
+	</mx:DataGrid>
+	
+	<fx:Declarations>
+		<mate:Dispatcher id="dispatcher"/>
+		<s:ArrayList id="arrList" source="{trackedEventsDates}"/>
+	</fx:Declarations>
+	
+</mx:Window>

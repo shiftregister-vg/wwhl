@@ -6,10 +6,14 @@ package com.slantsoft.events
 	{
 		public static const START:String = "StartTrackingEvent";
 		public static const STOP:String = "StopTrackingEvent";
+		public static const GET_TRACKED_EVENTS_BY_DATE:String = "GetTrackedEventsByDateTrackingEvent";
 		
 		public var description:String;
 		public var startDate:Date;
 		public var endDate:Date;
+		public var duration:String;
+		
+		public var dateString:String;
 		
 		public function TrackingEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=false)
 		{
