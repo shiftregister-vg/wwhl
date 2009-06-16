@@ -1,5 +1,6 @@
 package com.slantsoft.managers
 {
+	import com.slantsoft.views.ClientManager;
 	import com.slantsoft.views.HistoryWindow;
 	import com.slantsoft.views.UpdateWindow;
 	
@@ -10,6 +11,7 @@ package com.slantsoft.managers
 	{
 		private var historyWindow:HistoryWindow;
 		private var updateWindow:UpdateWindow;
+		private var clientManager:ClientManager;
 		
 		public function openHistoryWindow():void{
 			var targetHeight:int = 400;
@@ -49,6 +51,29 @@ package com.slantsoft.managers
 				updateWindow.nativeWindow.x = (Capabilities.screenResolutionX - targetWidth) / 2;
 				updateWindow.nativeWindow.y = (Capabilities.screenResolutionY - targetHeight) / 2;
 			}
+			
+			updateWindow.activate();
+		}
+		
+		public function openClientManager():void{
+			var targetHeight:int = 400;
+			var targetWidth:int = 600;
+			
+			if (!clientManager || clientManager.closed){
+				clientManager = new ClientManager();
+				
+				clientManager.height = targetHeight;
+				clientManager.width = targetWidth;
+				clientManager.minHeight = targetHeight;
+				clientManager.minWidth = targetWidth;
+				
+				clientManager.open();
+				
+				clientManager.nativeWindow.x = (Capabilities.screenResolutionX - targetWidth) / 2;
+				clientManager.nativeWindow.y = (Capabilities.screenResolutionY - targetHeight) / 2;
+			}
+			
+			clientManager.activate();
 		}
 	}
 }

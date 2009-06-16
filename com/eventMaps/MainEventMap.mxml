@@ -76,6 +76,10 @@
 			<mate:MethodInvoker generator="{NativeWindowManager}" method="openUpdateWindow"/>
 		</mate:EventHandlers>
 		
+		<mate:EventHandlers type="{ClientManagerEvent.OPEN}">
+			<mate:MethodInvoker generator="{NativeWindowManager}" method="openClientManager"/>
+		</mate:EventHandlers>
+		
 		<!-- Injectors -->
 		
 		<mate:Injectors targets="{[WhenWhatHowLong]}">

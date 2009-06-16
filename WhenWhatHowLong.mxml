@@ -6,17 +6,30 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.events.ListEvent;
+			import com.slantsoft.events.ClientManagerEvent;
 			import mx.controls.Alert;
 			import mx.collections.ArrayCollection;
 			import com.flexandair.StopWatch;
 			import com.slantsoft.events.HistoryEvent;
 			import com.slantsoft.events.TrackingEvent;
 			
+			private var _clients:Array;
 			private var _trackedEvents:Array;
 			private var startDate:Date;
 			private var endDate:Date;
 			
 			[Bindable] private var stopWatch:StopWatch = new StopWatch();
+			
+			public function set clients(value:Array):void{
+				_clients = value;
+				dispatchEvent(new Event("clientsChanged"));
+			}
+			
+			[Bindable ("clientsChanged")]
+			public function get clients():Array{
+				return _clients;
+			}
 			
 			public function set trackedEvents(value:Array):void{
 				_trackedEvents = value;
@@ -36,9 +49,19 @@
 			}
 			
 			private function onStartStopTBClick():void{
-				if (descriptionTI.text != ''){
+				var message:String = '';
+				if (descriptionTI.text == ''){
+					message += 'A description is required\n';
+				}
+				
+				if (!clientSelect.selectedItem){
+					message += 'Please select a client\n';
+				}
+				
+				if (descriptionTI.text != '' && clientSelect.selectedItem){
 					var isSelected:Boolean = startStopTB.selected;
 					var e:TrackingEvent;
+					
 					
 					if (isSelected){
 						startDate = new Date();
@@ -64,7 +87,7 @@
 					dispatcher.dispatchEvent(e);
 				} else {
 					startStopTB.selected = false;
-					Alert.show('A description is required');
+					Alert.show(message,'Attention!');
 				}
 			}
 			
@@ -86,6 +109,19 @@
 			private function startWatch():void{
 				
 			}
+
+			protected function clientManagerBtn_clickHandler(event:MouseEvent):void
+			{
+				var e:ClientManagerEvent = new ClientManagerEvent(ClientManagerEvent.OPEN);
+				dispatcher.dispatchEvent(e);
+			}
+
+
+			protected function clientSelect_changeHandler(event:ListEvent):void
+			{
+				// TODO Auto-generated method stub
+			}
+
 		]]>
 	</fx:Script>
 	
@@ -97,6 +133,8 @@
 	</s:HGroup>
 	
 	<s:HGroup width="100%" verticalAlign="middle" textAlign="center">
+		<mx:ComboBox editable="false" id="clientSelect" prompt="Select Client..." dataProvider="{clients}"
+			labelField="name" change="clientSelect_changeHandler(event)"/>
 		<mx:Spacer width="100%"/>
 		<mx:Label text="Elapsed Time:"/>
 		<mx:Label text="00:00:00" id="timerLbl"/>
@@ -110,6 +148,11 @@
 			<mx:DataGridColumn headerText="Duration" dataField="duration" width="100"/>
 		</mx:columns>
 	</mx:DataGrid>
+	
+	<s:HGroup width="100%" verticalAlign="middle">
+		<mx:Spacer width="100%"/>
+		<s:Button label="Client Manager" id="clientManagerBtn" click="clientManagerBtn_clickHandler(event)"/>
+	</s:HGroup>
 	
 	<fx:Declarations>
 		<mate:Dispatcher id="dispatcher"/>

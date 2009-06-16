@@ -25,10 +25,10 @@ package com.slantsoft.managers
 		}
 		
 		private function onDBOpen(event:SQLEvent):void{
-			createTables();
+			createTrackedEventsTable();
 		}
 		
-		private function createTables():void{
+		private function createTrackedEventsTable():void{
 			var createSQL:SQLStatement = new SQLStatement();
 			createSQL.sqlConnection = conn;
 			
@@ -38,14 +38,52 @@ package com.slantsoft.managers
 				"	startDateTime DATETIME, " +
 				"	endDateTime DATETIME, " +
 				"	description TEXT, " +
-				"	duration TEXT" +
+				"	duration TEXT," +
+				"	client_id INTEGER" +
 				")";
 			
 			createSQL.text = sql;
+			createSQL.addEventListener(SQLEvent.RESULT, checkClientIDCol);
+			createSQL.addEventListener(SQLErrorEvent.ERROR, onSQLError);
+			createSQL.execute();
+		}
+		
+		private function checkClientIDCol(event:SQLEvent):void{
+			var createSQL:SQLStatement = new SQLStatement();
+			createSQL.sqlConnection = conn;
 			
+			var sql:String = "SELECT client_id FROM trackedEvents LIMIT 1";
+			
+			createSQL.text = sql;
+			createSQL.addEventListener(SQLEvent.RESULT, createClientTable);
+			createSQL.addEventListener(SQLErrorEvent.ERROR, addClientIDCol);
+			createSQL.execute();
+		}
+		
+		private function addClientIDCol(event:SQLErrorEvent):void {
+			var createSQL:SQLStatement = new SQLStatement();
+			createSQL.sqlConnection = conn;
+			
+			var sql:String = "ALTER TABLE trackedEvents ADD COLUMN client_id INTEGER";
+			
+			createSQL.text = sql;
+			createSQL.addEventListener(SQLEvent.RESULT, checkClientIDCol);
+			createSQL.addEventListener(SQLErrorEvent.ERROR, onSQLError);
+			createSQL.execute();
+		}
+		
+		private function createClientTable(event:SQLEvent=null):void{
+			var createSQL:SQLStatement = new SQLStatement();
+			createSQL.sqlConnection = conn;
+			var sql:String =
+			"CREATE TABLE IF NOT EXISTS clients (" +
+			"	id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+			"	name TEXT" +
+			")";
+			
+			createSQL.text = sql;
 			createSQL.addEventListener(SQLEvent.RESULT, createResult);
 			createSQL.addEventListener(SQLErrorEvent.ERROR, onSQLError);
-			
 			createSQL.execute();
 		}
 		
