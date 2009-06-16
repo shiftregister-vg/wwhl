@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"	xmlns:mx="library://ns.adobe.com/flex/halo"
+	xmlns:components="spark.components.*" type="utility" layout="vertical" title="An Update is Available" width="350" height="150" creationComplete="init()"
+	horizontalAlign="center" verticalAlign="top" maximizable="false" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" resizable="false">
+	
+	<mx:Label text="Version {appData.version} is available.  Download it now?"/>
+	<s:HGroup>
+		<s:Button label="Yes" id="yesBtn" click="yesBtn_clickHandler(event)"/>
+		<s:Button label="No" id="noBtn" click="noBtn_clickHandler(event)"/>
+	</s:HGroup>
+	<s:TextArea width="100%" height="100%" text="{appData.update_notes}" editable="false"/>
+	<mx:ProgressBar id="download_progress" width="100%" height="0" visible="false" mode="manual"/>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.desktop.Updater;
+			import flash.filesystem.FileStream;
+			import flash.filesystem.File;
+			import com.asfusion.mate.ioc.InjectorRegistry;
+			
+			private var _appData:Object;
+			private var urlStream:URLStream = new URLStream();
+			
+			public function set appData(value:Object):void{
+				_appData = value;
+				dispatchEvent(new Event("appDataChanged"));
+			}
+			
+			[Bindable ("appDataChanged")]
+			public function get appData():Object{
+				return _appData;
+			}
+			
+			protected function init():void{
+				InjectorRegistry.register(this);
+			}
+
+			protected function yesBtn_clickHandler(event:MouseEvent):void
+			{
+				this.download_progress.percentHeight = 100;
+				this.download_progress.visible = true;
+				
+				var urlRequest:URLRequest = new URLRequest(appData.file_url);
+				urlStream.addEventListener(ProgressEvent.PROGRESS, onProgress);
+				urlStream.addEventListener(Event.COMPLETE,onComplete);
+				urlStream.load(urlRequest);
+			}
+
+			protected function onProgress(event:ProgressEvent):void{
+				this.download_progress.setProgress(event.bytesLoaded, event.bytesTotal);
+				var percentDownloaded:int = this.download_progress.percentComplete;
+				this.download_progress.label = 'Downloading ' + percentDownloaded + '%...';
+			}
+			
+			protected function onComplete(event:Event):void{
+				var fileData:ByteArray = new ByteArray();
+				urlStream.readBytes(fileData, 0, urlStream.bytesAvailable);
+				var file:File = File.applicationStorageDirectory.resolvePath('update.air');
+				var fileStream:FileStream = new FileStream();
+				fileStream.addEventListener(Event.CLOSE, fileClosed);
+				fileStream.openAsync(file, FileMode.WRITE);
+				fileStream.writeBytes(fileData, 0, fileData.length);
+				fileStream.close();
+			}
+			
+			protected function fileClosed(event:Event):void{
+				var updater:Updater = new Updater();
+				var airFile:File = File.applicationStorageDirectory.resolvePath('update.air');
+				updater.update(airFile, appData.version);
+			}
+			
+			protected function noBtn_clickHandler(event:MouseEvent):void
+			{
+				this.close();
+			}
+
+		]]>
+	</fx:Script>
+	
+</mx:Window>

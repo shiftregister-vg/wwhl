@@ -1,6 +1,7 @@
 package com.slantsoft.managers
 {
 	import com.slantsoft.views.HistoryWindow;
+	import com.slantsoft.views.UpdateWindow;
 	
 	import flash.events.EventDispatcher;
 	import flash.system.Capabilities;
@@ -8,6 +9,7 @@ package com.slantsoft.managers
 	public class NativeWindowManager extends EventDispatcher
 	{
 		private var historyWindow:HistoryWindow;
+		private var updateWindow:UpdateWindow;
 		
 		public function openHistoryWindow():void{
 			var targetHeight:int = 400;
@@ -28,6 +30,25 @@ package com.slantsoft.managers
 			}
 			
 			historyWindow.activate();
+		}
+		
+		public function openUpdateWindow():void{
+			var targetHeight:int = 150;
+			var targetWidth:int = 350;
+			
+			if (!updateWindow || updateWindow.closed){
+				updateWindow = new UpdateWindow();
+				
+				
+				
+				updateWindow.height = updateWindow.minHeight = updateWindow.maxHeight = targetHeight;
+				updateWindow.width = updateWindow.minWidth = updateWindow.maxWidth = targetWidth;
+				
+				updateWindow.open();
+				
+				updateWindow.nativeWindow.x = (Capabilities.screenResolutionX - targetWidth) / 2;
+				updateWindow.nativeWindow.y = (Capabilities.screenResolutionY - targetHeight) / 2;
+			}
 		}
 	}
 }

@@ -24,7 +24,7 @@
 	<name>WhenWhatHowLong</name>
 
 	<!-- An application version designator (such as "v1", "2.5", or "Alpha 1"). Required. -->
-	<version>0.1.0b</version>
+	<version>0.1.3b</version>
 
 	<!-- Description, displayed in the AIR application installer.
 	     May have multiple values for each language. See samples or xsd schema file. Optional. -->

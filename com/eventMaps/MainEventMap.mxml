@@ -8,12 +8,16 @@
 			import com.slantsoft.views.*;
 			
 			[Bindable] private var appOpenDate:Date = new Date();
+			[Bindable] private var ep:String = 'http://slantsoft.com/flex2gateway';
+			[Bindable] private var aumSource:String = 'com.slantsoft.facade.ApplicationUpdateManager';
+			[Bindable] private var application_id:int = 1;
 		]]>
 	</fx:Script>
 	
 	<fx:Declarations>
 		<mate:EventHandlers type="ApplicationInit">
 			<mate:MethodInvoker generator="{DatabaseManager}" method="initDatabase"/>
+			<mate:EventAnnouncer generator="{UpdateEvent}" type="{UpdateEvent.CHECK_FOR_UPDATE}"/>
 		</mate:EventHandlers>
 		
 		<mate:EventHandlers type="{DatabaseEvent.INIT_COMPLETE}">
@@ -55,7 +59,23 @@
 		<mate:EventHandlers type="{DatabaseEvent.TRACKED_EVENTS_BY_DATE}">
 			<mate:MethodInvoker generator="{TrackingManager}" method="storeTrackedEventsByDate" arguments="{event.recordSet}"/>
 		</mate:EventHandlers>
-
+		
+		<mate:EventHandlers type="{UpdateEvent.CHECK_FOR_UPDATE}">
+			<mate:MethodInvoker generator="{UpdateManager}" method="checkForUpdate"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{UpdateEvent.GET_REMOTE_APP_DATA}">
+			<mate:RemoteObjectInvoker endpoint="{ep}" source="{aumSource}" destination="ColdFusion" method="getAppData" arguments="{application_id}">
+				<mate:resultHandlers>
+					<mate:MethodInvoker generator="{UpdateManager}" method="storeAppData" arguments="{resultObject}"/>
+				</mate:resultHandlers>
+			</mate:RemoteObjectInvoker>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{UpdateEvent.OPEN_UPDATE_WINDOW}">
+			<mate:MethodInvoker generator="{NativeWindowManager}" method="openUpdateWindow"/>
+		</mate:EventHandlers>
+		
 		<!-- Injectors -->
 		
 		<mate:Injectors targets="{[WhenWhatHowLong]}">
@@ -65,6 +85,10 @@
 		<mate:Injectors target="{HistoryWindow}">
 			<mate:PropertyInjector source="{TrackingManager}" sourceKey="trackedEventsDates" targetKey="trackedEventsDates"/>
 			<mate:PropertyInjector source="{TrackingManager}" sourceKey="trackedEventsByDate" targetKey="trackedEventsByDate"/>
+		</mate:Injectors>
+		
+		<mate:Injectors target="{UpdateWindow}">
+			<mate:PropertyInjector source="{UpdateManager}" sourceKey="appData" targetKey="appData"/>
 		</mate:Injectors>
 	</fx:Declarations>
 </mate:EventMap>
