@@ -6,6 +6,7 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.events.ListEvent;
 			import com.slantsoft.events.TrackingEvent;
 			import com.slantsoft.events.DatabaseEvent;
 			import mx.controls.Alert;
@@ -14,6 +15,7 @@
 			
 			private var _trackedEventsDates:Array;
 			private var _trackedEventsByDate:Array;
+			private var _clients:Array;
 			
 			public function set trackedEventsDates(value:Array):void{
 				_trackedEventsDates = value;
@@ -27,12 +29,23 @@
 			
 			[Bindable ('trackedEventsDatesChanged')]
 			public function get trackedEventsDates():Array{
+				trackedEventsByDate = null;
 				return _trackedEventsDates;
 			}
 			
 			[Bindable ('trackedEventsByDateChanged')]
 			public function get trackedEventsByDate():Array{
 				return _trackedEventsByDate;
+			}
+			
+			public function set clients(value:Array):void{
+				_clients = value;
+				dispatchEvent(new Event("clientsChanged"));
+			}
+			
+			[Bindable ("clientsChanged")]
+			public function get clients():Array{
+				return _clients;
 			}
 			
 			private function init():void{
@@ -46,7 +59,15 @@
 
 			protected function datesList_clickHandler():void{
 				if (datesList.selectedItem){
-					var e:TrackingEvent = new TrackingEvent(TrackingEvent.GET_TRACKED_EVENTS_BY_DATE);
+					var e:TrackingEvent;
+					
+					if (clientSelect.selectedItem){
+						e = new TrackingEvent(TrackingEvent.GET_TRACKED_EVENTS_BY_CLIENT);
+						e.client = clientSelect.selectedItem;
+					} else {
+						e = new TrackingEvent(TrackingEvent.GET_TRACKED_EVENTS_BY_DATE)
+					}
+					
 					e.dateString = datesList.selectedItem.date;
 					dispatcher.dispatchEvent(e);
 				}
@@ -58,20 +79,50 @@
 				dispatcher.dispatchEvent(e);
 			}
 
+
+			protected function showAllCheckBox_clickHandler(event:MouseEvent):void
+			{
+				trackedEventsDates = null;
+				trackedEventsByDate = null;
+				
+				if (showAllCheckBox.selected){
+					clientSelect.selectedIndex = -1;
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.GET_TRACKED_EVENTS_DATES));
+				}
+			}
+
+
+			protected function clientSelect_changeHandler(event:ListEvent):void
+			{
+				var e:DatabaseEvent = new DatabaseEvent(DatabaseEvent.GET_TRACKED_EVENTS_DATES_BY_CLIENT);
+				e.client = clientSelect.selectedItem;
+				dispatcher.dispatchEvent(e);
+				showAllCheckBox.selected = false;
+			}
+
 		]]>
 	</fx:Script>
-	
-	<s:List id="datesList" height="100%" width="100" dataProvider="{arrList}"
-		click="datesList_clickHandler()" labelField="date"/>
-		
-	<mx:DataGrid id="trackedEventsDG" width="100%" height="100%" dataProvider="{trackedEventsByDate}" liveScrolling="true"
-		resizableColumns="false" variableRowHeight="true" sortableColumns="true" wordWrap="true">
-		<mx:columns>
-			<mx:DataGridColumn headerText="Start" dataField="startDateTime" width="100"/>
-			<mx:DataGridColumn headerText="Description" dataField="description" sortable="false"/>
-			<mx:DataGridColumn headerText="Duration" dataField="duration" width="100"/>
-		</mx:columns>
-	</mx:DataGrid>
+	<s:VGroup width="100%" height="100%">
+		<s:HGroup width="100%">
+			<mx:Spacer width="100%"/>
+			<s:CheckBox label="Show All" selected="true" id="showAllCheckBox" click="showAllCheckBox_clickHandler(event)"/>
+			<mx:ComboBox id="clientSelect" prompt="Select Client..." dataProvider="{clients}" labelField="name"
+				change="clientSelect_changeHandler(event)"/>
+		</s:HGroup>
+		<s:HGroup width="100%" height="100%">
+			<s:List id="datesList" height="100%" width="100" dataProvider="{arrList}"
+				click="datesList_clickHandler()" labelField="date"/>
+				
+			<mx:DataGrid id="trackedEventsDG" width="100%" height="100%" dataProvider="{trackedEventsByDate}" liveScrolling="true"
+				resizableColumns="false" variableRowHeight="true" sortableColumns="true" wordWrap="true">
+				<mx:columns>
+					<mx:DataGridColumn headerText="Start" dataField="startDateTime" width="100"/>
+					<mx:DataGridColumn headerText="Description" dataField="description" sortable="false"/>
+					<mx:DataGridColumn headerText="Duration" dataField="duration" width="100"/>
+				</mx:columns>
+			</mx:DataGrid>
+		</s:HGroup>
+	</s:VGroup>
 	
 	<fx:Declarations>
 		<mate:Dispatcher id="dispatcher"/>

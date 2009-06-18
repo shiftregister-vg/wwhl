@@ -1,6 +1,6 @@
 package com.slantsoft.managers
 {
-	import com.slantsoft.views.ClientManager;
+	import com.slantsoft.views.ClientManagerWindow;
 	import com.slantsoft.views.HistoryWindow;
 	import com.slantsoft.views.UpdateWindow;
 	
@@ -11,7 +11,7 @@ package com.slantsoft.managers
 	{
 		private var historyWindow:HistoryWindow;
 		private var updateWindow:UpdateWindow;
-		private var clientManager:ClientManager;
+		private var clientManager:ClientManagerWindow;
 		
 		public function openHistoryWindow():void{
 			var targetHeight:int = 400;
@@ -57,15 +57,17 @@ package com.slantsoft.managers
 		
 		public function openClientManager():void{
 			var targetHeight:int = 400;
-			var targetWidth:int = 600;
+			var targetWidth:int = 685;
 			
 			if (!clientManager || clientManager.closed){
-				clientManager = new ClientManager();
+				clientManager = new ClientManagerWindow();
 				
-				clientManager.height = targetHeight;
-				clientManager.width = targetWidth;
-				clientManager.minHeight = targetHeight;
-				clientManager.minWidth = targetWidth;
+				clientManager.height = clientManager.maxHeight = clientManager.minHeight = targetHeight;
+				clientManager.width = clientManager.maxWidth = clientManager.minWidth = targetWidth;
+				clientManager.showStatusBar = false;
+				clientManager.resizable = false;
+				clientManager.maximizable = false;
+				clientManager.type = 'utility';
 				
 				clientManager.open();
 				

@@ -15,6 +15,9 @@
 	</fx:Script>
 	
 	<fx:Declarations>
+		
+		<mate:Debugger level="{Debugger.ALL}"/>
+		
 		<mate:EventHandlers type="ApplicationInit">
 			<mate:MethodInvoker generator="{DatabaseManager}" method="initDatabase"/>
 			<mate:EventAnnouncer generator="{UpdateEvent}" type="{UpdateEvent.CHECK_FOR_UPDATE}"/>
@@ -22,6 +25,7 @@
 		
 		<mate:EventHandlers type="{DatabaseEvent.INIT_COMPLETE}">
 			<mate:EventAnnouncer generator="{DatabaseEvent}" type="{DatabaseEvent.GET_TRACKED_EVENTS}"/>
+			<mate:EventAnnouncer generator="{DatabaseEvent}" type="{DatabaseEvent.GET_CLIENTS}"/>
 		</mate:EventHandlers>
 		
 		<mate:EventHandlers type="{DatabaseEvent.GET_TRACKED_EVENTS}">
@@ -30,6 +34,49 @@
 		
 		<mate:EventHandlers type="{DatabaseEvent.TRACKED_EVENTS_RESULTS}">
 			<mate:MethodInvoker generator="{TrackingManager}" method="storeTrackedEvents" arguments="{event.recordSet}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.GET_CLIENTS}">
+			<mate:MethodInvoker generator="{DatabaseManager}" method="getClients"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.CLIENTS}">
+			<mate:MethodInvoker generator="{ClientManager}" method="storeClients" arguments="{event.recordSet}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.CREATE_CLIENT}">
+			<mate:MethodInvoker generator="{DatabaseManager}" method="createClient" arguments="{event.client}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.CREATE_CLIENT_COMPLETE}">
+			<mate:EventAnnouncer generator="{DatabaseEvent}" type="{DatabaseEvent.GET_CLIENTS}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.DELETE_CLIENT}">
+			<mate:MethodInvoker generator="{DatabaseManager}" method="deleteClient" arguments="{event.client}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.DELETE_CLIENT_COMPLETE}">
+			<mate:EventAnnouncer generator="{DatabaseEvent}" type="{DatabaseEvent.GET_CLIENTS}"/>
+			<mate:EventAnnouncer generator="{DatabaseEvent}" type="{DatabaseEvent.DELETE_CLIENT_EVENTS}">
+				<mate:Properties client="{event.client}"/>
+			</mate:EventAnnouncer>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.DELETE_CLIENT_EVENTS}">
+			<mate:MethodInvoker generator="{DatabaseManager}" method="deleteClientTrackedEvents" arguments="{event.client}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.DELETE_CLIENT_EVENTS_COMPLETE}">
+			<mate:EventAnnouncer generator="{DatabaseEvent}" type="{DatabaseEvent.GET_TRACKED_EVENTS}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.UPDATE_CLIENT}">
+			<mate:MethodInvoker generator="{DatabaseManager}" method="updateClient" arguments="{event.client}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.UPDATE_CLIENT_COMPLETE}">
+			<mate:EventAnnouncer generator="{DatabaseEvent}" type="{DatabaseEvent.GET_CLIENTS}"/>
 		</mate:EventHandlers>
 		
 		<mate:EventHandlers type="{TrackingEvent.START}">
@@ -58,6 +105,14 @@
 		
 		<mate:EventHandlers type="{DatabaseEvent.TRACKED_EVENTS_BY_DATE}">
 			<mate:MethodInvoker generator="{TrackingManager}" method="storeTrackedEventsByDate" arguments="{event.recordSet}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{DatabaseEvent.GET_TRACKED_EVENTS_DATES_BY_CLIENT}">
+			<mate:MethodInvoker generator="{DatabaseManager}" method="getHistoryDatesByClient" arguments="{event.client}"/>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{TrackingEvent.GET_TRACKED_EVENTS_BY_CLIENT}">
+			<mate:MethodInvoker generator="{DatabaseManager}" method="getHistoryByDateAndClient" arguments="{[event.dateString, event.client]}"/>
 		</mate:EventHandlers>
 		
 		<mate:EventHandlers type="{UpdateEvent.CHECK_FOR_UPDATE}">
@@ -93,6 +148,10 @@
 		
 		<mate:Injectors target="{UpdateWindow}">
 			<mate:PropertyInjector source="{UpdateManager}" sourceKey="appData" targetKey="appData"/>
+		</mate:Injectors>
+		
+		<mate:Injectors targets="{[WhenWhatHowLong, ClientManagerWindow, HistoryWindow]}">
+			<mate:PropertyInjector source="{ClientManager}" sourceKey="clients" targetKey="clients"/>
 		</mate:Injectors>
 	</fx:Declarations>
 </mate:EventMap>
